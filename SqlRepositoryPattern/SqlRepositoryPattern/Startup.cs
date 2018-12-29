@@ -7,6 +7,7 @@ using BusinessLogicLayer.IBLL;
 using Core.DBContext;
 using DALRepository.IRepositories;
 using DALRepository.Repositories;
+using DALRepository.UnitOfWork;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,7 @@ namespace SqlRepositoryPattern
             configureApplicationDBContext(services);
             configureBLL(services);
             configureDALRepositories(services);
+            configureUnitOfWorks(services);
             services.AddMvc();
         }
 
@@ -53,11 +55,16 @@ namespace SqlRepositoryPattern
             services.AddScoped<IMovieRepository, MovieRepository>();
         }
 
+        private void configureUnitOfWorks(IServiceCollection services)
+        {
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+        }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, LifebookDbContext dbContext)
         {
             //do not open
-            dbContext.Database.Migrate();
+            //dbContext.Database.Migrate();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
