@@ -2,8 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BusinessLogicLayer.BLL;
+using BusinessLogicLayer.IBLL;
+using Core.DBContext;
+using DALRepository.IRepositories;
+using DALRepository.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -23,12 +29,35 @@ namespace SqlRepositoryPattern
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            configureApplicationDBContext(services);
+            configureBLL(services);
+            configureDALRepositories(services);
             services.AddMvc();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        private void configureApplicationDBContext(IServiceCollection services)
         {
+            services.AddDbContext<LifebookDbContext>(
+            options => options.UseSqlServer(Configuration
+            .GetConnectionString("LifebookConnectionString")),
+            ServiceLifetime.Scoped);
+        }
+
+        private void configureBLL(IServiceCollection services)
+        {
+            services.AddScoped<IMovieBLL, MovieBLL>();
+        }
+
+        private void configureDALRepositories(IServiceCollection services)
+        {
+            services.AddScoped<IMovieRepository, MovieRepository>();
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, LifebookDbContext dbContext)
+        {
+            //do not open
+            dbContext.Database.Migrate();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
