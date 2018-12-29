@@ -2,6 +2,7 @@
 using Core.Entities;
 using DALRepository.IRepositories;
 using Microsoft.EntityFrameworkCore;
+using Models.DataTransferObject;
 using Models.QueryFilters;
 using System;
 using System.Collections.Generic;
@@ -18,12 +19,27 @@ namespace DALRepository.Repositories
         protected MovieRepository(LifebookDbContext context) : base(context)
         {
         }
+
+        public async Task<List<Movie>> GetFilteredData(MovieFilter movieFilter)
+        {
+            var expression = BuildQueryExpression(movieFilter);
+            return await base.GetFilteredData(expression);
+        }
+
+        public async Task<DataList<Movie>> GetFilteredDataWithPaging(MovieFilter movieFilter,
+                                       int page, int pageSize)
+        {
+            var expression = BuildQueryExpression(movieFilter);
+            return await base.GetFilteredDataWithPaging(expression, page, pageSize);
+        }
+
+
         /// <summary>
         /// replace with generic method 
         /// </summary>
         /// <param name="movieFilter"></param>
         /// <returns></returns>
-        public async Task<List<Movie>> GetWithFilters(MovieFilter movieFilter)
+        private Expression<Func<Movie, bool>> BuildQueryExpression(MovieFilter movieFilter)
         {
             Expression<Func<Movie, bool>> exp1 = null;
             Expression<Func<Movie, bool>> exp2 = null;
@@ -79,14 +95,7 @@ namespace DALRepository.Repositories
                     exp1 = QueryExpression.CreateAndExpression(exp1, exp2);
                 }
             }
-            if (exp1 != null)
-            {
-                return await _DefaultQuery.Where(exp1).ToListAsync();
-            }
-            else
-            {
-                return await _DefaultQuery.ToListAsync();
-            }
+            return exp1;
         }
     }
 }

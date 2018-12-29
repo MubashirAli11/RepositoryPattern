@@ -2,9 +2,11 @@
 using Core.Entities;
 using DALRepository.IRepositories;
 using Microsoft.EntityFrameworkCore;
+using Models.DataTransferObject;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -131,6 +133,35 @@ namespace DALRepository.Repositories
             }
         }
 
+        public async Task<DataList<TEntity>> GetAllDataWithPaging(int page, int pageSize)
+        {
+            DataList<TEntity> dataList = new DataList<TEntity>();
+            dataList.TotalCount = await this._Entity.CountAsync();
+            int skip = (page - 1) * pageSize;
+            int take = skip + pageSize;
+            dataList.Data = await this._Entity.OrderByDescending(x => x.Id)
+                            .Skip(skip).Take(take).ToListAsync();
+            return dataList;
+        }
+
+        protected async Task<List<TEntity>> GetFilteredData(Expression<Func<TEntity, bool>> exp)
+        {
+            return await this._Entity.Where(exp).ToListAsync();
+        }
+
+        protected async Task<DataList<TEntity>> GetFilteredDataWithPaging(Expression<Func<TEntity, bool>> exp,
+                                                                     int page, int pageSize)
+        {
+            DataList<TEntity> dataList = new DataList<TEntity>();
+            dataList.TotalCount = await this._Entity.Where(exp).CountAsync();
+            int skip = (page - 1) * pageSize;
+            int take = skip + pageSize;
+            dataList.Data = await this._Entity.Where(exp)
+                            .OrderByDescending(x => x.Id)
+                            .Skip(skip).Take(take).ToListAsync();
+            return dataList;
+        }
+
         protected IQueryable<TEntity> _DefaultQuery
         {
             get
@@ -138,5 +169,6 @@ namespace DALRepository.Repositories
                 return this._Entity.AsQueryable();
             }
         }
+
     }
 }

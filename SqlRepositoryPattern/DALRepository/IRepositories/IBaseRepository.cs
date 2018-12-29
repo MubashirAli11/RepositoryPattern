@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Models.DataTransferObject;
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -42,5 +44,6 @@ namespace DALRepository.IRepositories
         Task Delete(TKey id, bool isHardDelete = false);
         void DeleteMultiple(List<TEntity> entities, bool isHardDelete = false);
         Task DeleteMultiple(List<TKey> ids, bool isHardDelete = false);
+        Task<DataList<TEntity>> GetAllDataWithPaging(int page = 1, int pageSize = 10);
     }
 }
