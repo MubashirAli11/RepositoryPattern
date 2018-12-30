@@ -27,37 +27,37 @@ namespace Core.DBContext
             {
                 Id = 1,
                 Name = "Avengers: Infinity War",
-                ReleaseDate = Convert.ToDateTime("23-04-18"),
+                ReleaseDate = DateTime.UtcNow.AddMonths(-8),
                 IMDBRating = 8.5,
                 Budget = "400M",
-                BoxOfficeAmount = "2B"
+                BoxOfficeAmount = "2B",
+                CreatedOn = DateTime.UtcNow,
+                IsActive = true,
+                IsDeleted = false
             },
             new
             {
                 Id = 2,
                 Name = "The Wolf of Wall Street",
-                ReleaseDate = Convert.ToDateTime("17-01-14"),
+                ReleaseDate = DateTime.UtcNow.AddYears(-5),
                 IMDBRating = 8.2,
                 Budget = "50M",
-                BoxOfficeAmount = "389M"
+                BoxOfficeAmount = "389M",
+                CreatedOn = DateTime.UtcNow,
+                IsActive = true,
+                IsDeleted = false
             },
-             new
-             {
-                 Id = 2,
-                 Name = "The Wolf of Wall Street",
-                 ReleaseDate = Convert.ToDateTime("17-01-14"),
-                 IMDBRating = 8.2,
-                 Budget = "50M",
-                 BoxOfficeAmount = "389M"
-             },
             new
             {
                 Id = 3,
                 Name = "Identity",
-                ReleaseDate = Convert.ToDateTime("25-04-03"),
+                ReleaseDate = DateTime.UtcNow.AddYears(-15),
                 IMDBRating = 7.3,
                 Budget = "20M",
-                BoxOfficeAmount = "90M"
+                BoxOfficeAmount = "90M",
+                CreatedOn = DateTime.UtcNow,
+                IsActive = true,
+                IsDeleted = false
             }
             );
 

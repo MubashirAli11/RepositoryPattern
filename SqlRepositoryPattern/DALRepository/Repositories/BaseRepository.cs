@@ -12,7 +12,9 @@ using System.Threading.Tasks;
 
 namespace DALRepository.Repositories
 {
-    public abstract class BaseRepository<TEntity, TKey> : IBaseRepository<TEntity, TKey> where TEntity : BaseEntity<TKey> where TKey : IEquatable<TKey>
+    public abstract class BaseRepository<TEntity, TKey> :
+    IBaseRepository<TEntity, TKey> where TEntity : BaseEntity<TKey>
+    where TKey : IEquatable<TKey>
     {
         private readonly LifebookDbContext _context;
         protected DbSet<TEntity> _Entity;
@@ -23,23 +25,23 @@ namespace DALRepository.Repositories
             this._Entity = context.Set<TEntity>();
         }
 
-        public async Task<TEntity> Get(TKey id)
+        protected IQueryable<TEntity> Get(TKey id)
         {
             if (id.Equals(null))
             {
                 throw new ArgumentNullException("key");
             }
-            return await this._Entity.FirstOrDefaultAsync(x => x.Id.Equals(id));
+            return this._Entity.Where(x => x.Id.Equals(id));
         }
 
-        public async Task<List<TEntity>> GetByIds(List<TKey> ids)
+        protected IQueryable<TEntity> GetByIds(List<TKey> ids)
         {
-            return await this._Entity?.Where(x => ids.Contains(x.Id))?.ToListAsync();
+            return this._Entity?.Where(x => ids.Contains(x.Id));
         }
 
-        public async Task<List<TEntity>> GetAll()
+        protected IQueryable<TEntity> GetAll()
         {
-            return await this._Entity.ToListAsync();
+            return this._Entity;
         }
 
         public void Insert(TEntity entity)
@@ -111,7 +113,7 @@ namespace DALRepository.Repositories
             {
                 throw new ArgumentNullException("key");
             }
-            var entity = await Get(id);
+            var entity = await Get(id).FirstOrDefaultAsync();
             if (isHardDelete)
             {
                 this._context.Entry(entity).State = EntityState.Deleted;
@@ -125,7 +127,7 @@ namespace DALRepository.Repositories
 
         public async Task DeleteMultiple(List<TKey> ids, bool isHardDelete = false)
         {
-            var entities = await GetByIds(ids);
+            var entities = await GetByIds(ids).ToListAsync();
 
             for (int i = 0; i < entities.Count; i++)
             {
@@ -133,33 +135,9 @@ namespace DALRepository.Repositories
             }
         }
 
-        public async Task<DataList<TEntity>> GetAllDataWithPaging(int page, int pageSize)
+        protected IQueryable<TEntity> GetFilteredData(Expression<Func<TEntity, bool>> exp)
         {
-            DataList<TEntity> dataList = new DataList<TEntity>();
-            dataList.TotalCount = await this._Entity.CountAsync();
-            int skip = (page - 1) * pageSize;
-            int take = skip + pageSize;
-            dataList.Data = await this._Entity.OrderByDescending(x => x.Id)
-                            .Skip(skip).Take(take).ToListAsync();
-            return dataList;
-        }
-
-        protected async Task<List<TEntity>> GetFilteredData(Expression<Func<TEntity, bool>> exp)
-        {
-            return await this._Entity.Where(exp).ToListAsync();
-        }
-
-        protected async Task<DataList<TEntity>> GetFilteredDataWithPaging(Expression<Func<TEntity, bool>> exp,
-                                                                     int page, int pageSize)
-        {
-            DataList<TEntity> dataList = new DataList<TEntity>();
-            dataList.TotalCount = await this._Entity.Where(exp).CountAsync();
-            int skip = (page - 1) * pageSize;
-            int take = skip + pageSize;
-            dataList.Data = await this._Entity.Where(exp)
-                            .OrderByDescending(x => x.Id)
-                            .Skip(skip).Take(take).ToListAsync();
-            return dataList;
+            return this._Entity.Where(exp);
         }
 
         protected IQueryable<TEntity> _DefaultQuery

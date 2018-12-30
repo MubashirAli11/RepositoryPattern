@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace DALRepository.IRepositories
 {
-    public interface IMovieRepository:IBaseRepository<Movie,int>
+    public interface IMovieRepository:IBaseRepository<Movie, int>
     {
-        Task<List<Movie>> GetFilteredData(MovieFilter movieFilter);
-        Task<DataList<Movie>> GetFilteredDataWithPaging(MovieFilter movieFilter,
-                                       int page, int pageSize);
+        Task<MovieDTO> GetById(int id);
+        Task<DataList<MovieDTO>> GetAllMovies(int page, int pageSize);
+        Task<DataList<MovieDTO>> GetFilteredData(MovieFilter movieFilter);
     }
 }

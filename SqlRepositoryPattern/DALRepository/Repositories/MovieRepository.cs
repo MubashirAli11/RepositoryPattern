@@ -16,24 +16,94 @@ namespace DALRepository.Repositories
 {
     public class MovieRepository : BaseRepository<Movie, int>, IMovieRepository
     {
-        protected MovieRepository(LifebookDbContext context) : base(context)
+        public MovieRepository(LifebookDbContext context) : base(context)
         {
         }
 
-        public async Task<List<Movie>> GetFilteredData(MovieFilter movieFilter)
+        public async Task<MovieDTO> GetById(int id)
+        {
+            var query = base.Get(id);
+            var data = await (from movie in query
+                              select new MovieDTO
+                              {
+                                  Name = movie.Name,
+                                  IMDBRating = movie.IMDBRating,
+                                  Budget = movie.Budget,
+                                  BoxOfficeAmount = movie.BoxOfficeAmount,
+                                  ReleaseDate = movie.ReleaseDate,
+                                  CreatedOn = movie.CreatedOn,
+                                  LastModifiedOn = movie.LastModifiedOn,
+                                  CreatedBy = movie.CreatedBy,
+                                  IsActive = movie.IsActive,
+                                  IsDeleted = movie.IsDeleted,
+                                  LastModifiedBy = movie.LastModifiedBy
+                              }).FirstOrDefaultAsync();
+            return data;
+        }
+
+        public async Task<DataList<MovieDTO>> GetAllMovies(int page, int pageSize)
+        {
+            var query = base.GetAll();
+            DataList<MovieDTO> dataList = new DataList<MovieDTO>();
+            dataList.TotalCount = query.Count();
+            int skip = (page - 1) * pageSize;
+            int take = skip + pageSize;
+            dataList.Data = await (from movie in query
+                              select new MovieDTO
+                              {
+                                  Name = movie.Name,
+                                  IMDBRating = movie.IMDBRating,
+                                  Budget = movie.Budget,
+                                  BoxOfficeAmount = movie.BoxOfficeAmount,
+                                  ReleaseDate = movie.ReleaseDate,
+                                  CreatedOn = movie.CreatedOn,
+                                  LastModifiedOn = movie.LastModifiedOn,
+                                  CreatedBy = movie.CreatedBy,
+                                  IsActive = movie.IsActive,
+                                  IsDeleted = movie.IsDeleted,
+                                  LastModifiedBy = movie.LastModifiedBy
+                              }).OrderByDescending(x=>x.IsDeleted)
+                              .Skip(skip)
+                              .Take(take)
+                              .ToListAsync();
+            return dataList;
+        }
+
+        public async Task<DataList<MovieDTO>> GetFilteredData(MovieFilter movieFilter)
         {
             var expression = BuildQueryExpression(movieFilter);
-            return await base.GetFilteredData(expression);
+            if (expression != null)
+            {
+                var query = base.GetFilteredData(expression);
+                DataList<MovieDTO> dataList = new DataList<MovieDTO>();
+                dataList.TotalCount = query.Count();
+                int skip = (movieFilter.Page - 1) * movieFilter.PageSize;
+                int take = skip + movieFilter.PageSize;
+                dataList.Data = await (from movie in query
+                                       select new MovieDTO
+                                       {
+                                           Name = movie.Name,
+                                           IMDBRating = movie.IMDBRating,
+                                           Budget = movie.Budget,
+                                           BoxOfficeAmount = movie.BoxOfficeAmount,
+                                           ReleaseDate = movie.ReleaseDate,
+                                           CreatedOn = movie.CreatedOn,
+                                           LastModifiedOn = movie.LastModifiedOn,
+                                           CreatedBy = movie.CreatedBy,
+                                           IsActive = movie.IsActive,
+                                           IsDeleted = movie.IsDeleted,
+                                           LastModifiedBy = movie.LastModifiedBy
+                                       }).OrderByDescending(x => x.IsDeleted)
+                               .Skip(skip)
+                               .Take(take)
+                               .ToListAsync();
+                return dataList;
+            }
+            else
+            {
+                return await GetAllMovies(movieFilter.Page, movieFilter.PageSize);
+            }
         }
-
-        public async Task<DataList<Movie>> GetFilteredDataWithPaging(MovieFilter movieFilter,
-                                       int page, int pageSize)
-        {
-            var expression = BuildQueryExpression(movieFilter);
-            return await base.GetFilteredDataWithPaging(expression, page, pageSize);
-        }
-
-
         /// <summary>
         /// replace with generic method 
         /// </summary>
@@ -73,5 +143,6 @@ namespace DALRepository.Repositories
             }
             return exp1;
         }
+
     }
 }
