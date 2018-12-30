@@ -17,5 +17,11 @@ namespace Models.DataTransferObject
         /// your country or not?
         /// </summary>
         public string Available { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime? LastModifiedOn { get; set; }
+        public string CreatedBy { get; set; }
+        public string LastModifiedBy { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

@@ -33,7 +33,7 @@ namespace SqlRepositoryPattern
             configureApplicationDBContext(services);
             configureBLL(services);
             configureDALRepositories(services);
-            configureUnitOfWorks(services);
+            configureUnitOfWork(services);
             services.AddMvc();
         }
 
@@ -55,7 +55,7 @@ namespace SqlRepositoryPattern
             services.AddScoped<IMovieRepository, MovieRepository>();
         }
 
-        private void configureUnitOfWorks(IServiceCollection services)
+        private void configureUnitOfWork(IServiceCollection services)
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
         }
@@ -70,7 +70,12 @@ namespace SqlRepositoryPattern
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                   name: "default",
+                   template: "{controller=Home}/{action=Index}/{id?}");
+            });
         }
     }
 }
