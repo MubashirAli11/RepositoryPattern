@@ -7,10 +7,15 @@ namespace Core.Entities
 {
     public class BaseEntity<TKey>
     {
+        public BaseEntity()
+        {
+            IsActive = true;
+            CreatedOn = DateTime.UtcNow;
+        }
         public TKey Id { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedOn { get; set; }
-        public DateTime LastModifiedOn { get; set; }
+        public DateTime? LastModifiedOn { get; set; }
         [MaxLength(200)]
         public string CreatedBy { get; set; }
         [MaxLength(200)]
