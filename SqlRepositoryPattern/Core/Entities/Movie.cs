@@ -11,8 +11,10 @@ namespace Core.Entities
         public string Name { get; set; }
         public DateTime ReleaseDate { get; set; }
         public double IMDBRating { get; set; }
-        public double Budget { get; set; }
-        public double BoxOfficeAmount { get; set; }
+        [MaxLength(50)]
+        public string Budget { get; set; }
+        [MaxLength(50)]
+        public string BoxOfficeAmount { get; set; }
     }
 }
 

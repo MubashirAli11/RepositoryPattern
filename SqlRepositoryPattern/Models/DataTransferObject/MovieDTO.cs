@@ -9,8 +9,8 @@ namespace Models.DataTransferObject
         public string Name { get; set; }
         public DateTime ReleaseDate { get; set; }
         public double IMDBRating { get; set; }
-        public double Budget { get; set; }
-        public double BoxOfficeAmount { get; set; }
+        public string Budget { get; set; }
+        public string BoxOfficeAmount { get; set; }
         /// <summary>
         /// Derived column. It will show you whether
         /// this movie is available in

@@ -71,30 +71,6 @@ namespace DALRepository.Repositories
                     exp1 = QueryExpression.CreateAndExpression(exp1, exp2);
                 }
             }
-            if (movieFilter.Budget > 0)
-            {
-                if (exp1 == null)
-                {
-                    exp1 = x => x.Budget > movieFilter.Budget;
-                }
-                else
-                {
-                    exp2 = x => x.Budget > movieFilter.Budget;
-                    exp1 = QueryExpression.CreateAndExpression(exp1, exp2);
-                }
-            }
-            if (movieFilter.BoxOfficeAmount > 0)
-            {
-                if (exp1 == null)
-                {
-                    exp1 = x => x.BoxOfficeAmount > movieFilter.BoxOfficeAmount;
-                }
-                else
-                {
-                    exp2 = x => x.BoxOfficeAmount > movieFilter.BoxOfficeAmount;
-                    exp1 = QueryExpression.CreateAndExpression(exp1, exp2);
-                }
-            }
             return exp1;
         }
     }
